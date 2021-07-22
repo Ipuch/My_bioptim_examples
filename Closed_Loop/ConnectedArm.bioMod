@@ -1,0 +1,112 @@
+version 4
+
+gravity 0 0 -9.81
+
+segment ground
+endsegment
+
+    // Markers on ground
+    marker mg1
+        parent ground
+        position 0 0.1 0
+    endmarker
+    marker mg2
+        parent ground
+        position 0 0.3 0
+    endmarker
+    marker mg3
+        parent ground
+        position 0 0.3 0.1
+    endmarker
+
+segment    Segment1
+        rotations    x
+        ranges
+            -3*pi/4 3*pi/4
+        mass    3
+        inertia
+            0.50    0.00    0.00
+            0.00    0.5     0.00
+            0.00    0.00    0.5
+        com     0       0.1       0
+        mesh    0   0   -0.01
+        mesh    0   0    0.01
+        mesh    0   0.2  0.01
+        mesh    0   0.2 -0.01
+        mesh    0   0   -0.01
+endsegment
+
+segment    Segment2
+        parent    Segment1
+        rtinmatrix 0
+        rt 0 0 0 xyz 0     0.2     0
+        rotations    x
+        ranges
+            -pi pi
+        mass    3
+        inertia
+            0.50    0.00    0.00
+            0.00    0.5     0.00
+            0.00    0.00    0.5
+        com     0       0.11       0
+        mesh    0   0   -0.01
+        mesh    0   0    0.01
+        mesh    0   0.2  0.01
+        mesh    0   0.2 -0.01
+        mesh    0   0   -0.01
+endsegment
+
+// Markers
+    marker    md
+        parent    Segment2
+        position    0 0.2 0
+    endmarker
+
+segment    Segment3
+        parent    Segment2
+        rtinmatrix 0
+        rt 0 0 0 xyz 0     0.1     0
+        rotations    x
+        ranges
+            -pi pi
+        mass    0
+        inertia
+            0.0    0.00    0.00
+            0.00    0.0     0.00
+            0.00    0.00    0.0
+        com     0       0       0
+endsegment
+
+segment    Segment4
+        parent    Segment3
+        rtinmatrix 0
+        rt 0 0 0 xyz 0     0     0
+        translations  z
+        ranges
+            -0.1  1
+        mass    0
+        inertia
+            0.0    0.00    0.00
+            0.00    0.0     0.00
+            0.00    0.00    0.0
+        com     0       0       0
+        mesh    0  0    0
+        mesh    0  -0.02    0.02
+        mesh    0   0.02    0.04
+        mesh    0   -0.02   0.06
+        mesh    0   0.02    0.08
+        mesh    0   -0.02   0.1
+endsegment
+
+    // Contact
+    contact    Contact_Leg1
+        parent    Segment4
+        position  0 0 0.1
+        axis    yz
+    endcontact
+
+    // Markers
+    marker    m0
+        parent    Segment4
+        position    0 0 0.1
+    endmarker
