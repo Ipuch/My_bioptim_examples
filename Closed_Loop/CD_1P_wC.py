@@ -27,12 +27,14 @@ from bioptim import (
     ConstraintList,
     DynamicsFunctions,
     NonLinearProgram,
+    ConfigureProblem,
 )
 
+# k = 10
 
-def custom_dynamic(states: MX.sym, controls: MX.sym, parameters: MX.sym, nlp) -> MX:
+def custom_dynamic(states: MX.sym, controls: MX.sym, parameters: MX.sym, nlp, with_contact=None, k=None) -> tuple:
     """
-     Forward dynamics driven by joint torques with contact constraints.
+     Forward dynamics driven by joint torques with springs.
 
     Parameters
     ----------
@@ -51,20 +53,32 @@ def custom_dynamic(states: MX.sym, controls: MX.sym, parameters: MX.sym, nlp) ->
         The derivative of the states
     """
     DynamicsFunctions.apply_parameters(parameters, nlp)
-    q, qdot, tau = DynamicsFunctions.dispatch_q_qdot_tau_data(states, controls, nlp)
+    q = DynamicsFunctions.get(nlp.states["q"], states)
+    qdot = DynamicsFunctions.get(nlp.states["qdot"], states)
+    tau = DynamicsFunctions.get(nlp.controls["tau"], controls)
 
-    nb_tau = nlp.tau.shape[0]
+    nb_tau = len(nlp.controls["tau"].index)
     tau_p = MX.zeros(nb_tau)
-    tau_p[3] = -10 * (q[3] - 0.1)
 
-    qddot = biorbd.Model.ForwardDynamicsConstraintsDirect(nlp.model, q, qdot, tau + tau_p).to_mx()
+    # Spring parameters
+    # k = 10
+    l0 = 0.1
 
+    tau_p[3] = -k * (q[3] - l0)
+
+    dq = DynamicsFunctions.compute_qdot(nlp, q, qdot)
+    ddq = nlp.model.ForwardDynamics(q, qdot, tau + tau_p).to_mx()
     print(tau_p[3])
-    # qdot = nlp.model.computeQdot(q, qdot).to_mx()
-    # qdot_reduced = nlp.mapping["q"].to_first.map(qdot)
-    # qddot_reduced = nlp.mapping["qdot"].to_first.map(qddot)
 
-    return qdot, qddot
+    return dq, ddq
+
+
+def dynamic_config(ocp: OptimalControlProgram, nlp: NonLinearProgram, with_contact=True, k=None):
+    ConfigureProblem.configure_q(nlp, as_states=True, as_controls=False)
+    ConfigureProblem.configure_qdot(nlp, as_states=True, as_controls=False)
+    ConfigureProblem.configure_tau(nlp, as_states=False, as_controls=True)
+    ConfigureProblem.configure_dynamics_function(ocp, nlp, custom_dynamic, with_contact=with_contact, k=k)
+
 
 
 def prepare_ocp(
@@ -80,9 +94,6 @@ def prepare_ocp(
         The path to the bioMod
     ode_solver: OdeSolver
         The ode solve to use
-    long_optim: bool
-        If the solver should solve the precise optimization (500 shooting points) or the approximate (50 points)
-
     Returns
     -------
     The OptimalControlProgram ready to be solved
@@ -90,18 +101,17 @@ def prepare_ocp(
 
     biorbd_model = biorbd.Model(biorbd_model_path),
 
-    n_shooting = 100,
+    n_shooting = 20,
     final_time = 0.1,
 
     tau_min, tau_max, tau_init = -2000, 2000, 0
 
-    dynamics = DynamicsList()
-    dynamics = Dynamics(DynamicsFcn.TORQUE_DRIVEN, with_contact=True, dynamic_function=custom_dynamic)
+    dynamics = Dynamics(dynamic_config, with_contact=True, dynamic_function=custom_dynamic, k=20)
 
     objective_functions = ObjectiveList()
-    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_TORQUE, weight=0.1, phase=0)
-    objective_functions.add(ObjectiveFcn.Lagrange.SUPERIMPOSE_MARKERS, weight=100, first_marker="m0",
-                            second_marker="mg3")
+    # objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=0)
+    # objective_functions.add(ObjectiveFcn.Lagrange.SUPERIMPOSE_MARKERS, weight=100, first_marker="m0",
+                            # second_marker="mg3")
     # objective_functions.add(ObjectiveFcn.Mayer.SUPERIMPOSE_MARKERS, weight=100, first_marker="md",
     #                         second_marker="mg2")
 
@@ -127,15 +137,15 @@ def prepare_ocp(
 
     # Constraints
     constraints = ConstraintList()
-    constraints.add(
-        ConstraintFcn.TRACK_CONTACT_FORCES,
-        # min_bound=0,
-        # max_bound=np.inf,
-        node=Node.ALL,
-        contact_index=[0, 1],
-    )
-    constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.START, first_marker="md", second_marker="mg1")
-    constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.END, first_marker="md", second_marker="mg2")
+    # constraints.add(
+    #     ConstraintFcn.TRACK_CONTACT_FORCES,
+    #     # min_bound=0,
+    #     # max_bound=np.inf,
+    #     node=Node.ALL,
+    #     contact_index=[0, 1],
+    # )
+    # constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.START, first_marker="md", second_marker="mg1")
+    # constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.END, first_marker="md", second_marker="mg2")
     constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.START, first_marker="m0", second_marker="mg3")
 
     # constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.START, first_marker="md", second_marker="mg1")

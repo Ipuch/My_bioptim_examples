@@ -5,11 +5,11 @@ digraph ocp_graph {
 		node [color=white style=filled]
 		color=lightgrey style=filled
 		label=<<u><b>Phase #0</b></u>>
-		nlp_node_0 [label=<<b>Model</b>: ConnectedArm.bioMod<br/><b>Phase duration</b>: 0.2 s<br/><b>Shooting nodes</b>: 100<br/><b>Dynamics</b>: TORQUE_DRIVEN_WITH_CONTACT<br/><b>ODE</b>: RK4>]
+		nlp_node_0 [label=<<b>Model</b>: ConnectedArm.bioMod<br/><b>Phase duration</b>: 0.1 s<br/><b>Shooting nodes</b>: 20<br/><b>Dynamics</b>: TORQUE_DRIVEN<br/><b>ODE</b>: RK4<br/><b>Control type</b>: CONSTANT>]
 		param_00 [label=<<u><b>Parameters</b></u><br/> No parameter set>]
-		lagrange_0 [label=<<u><b>Lagrange</b></u><br/>(MINIMIZE_TORQUE)<sup>2</sup><br/><b>Weight</b>: 0.1<br/><b>Index in list</b>: 0<br/><br/>(SUPERIMPOSE_MARKERS)<sup>2</sup><br/><b>Weight</b>: 10000<br/><b>first_marker</b>: mg3<br/><b>second_marker</b>: m0<br/><b>Index in list</b>: 1<br/><br/>>]
+		lagrange_0 [label=<<u><b>Lagrange</b></u><br/> No Lagrange set>]
 		mayer_node_0 [label=<<u><b>Mayer</b></u><br/>No Mayer set>]
-		constraints_node_0 [label=<<u><b>Constraints</b></u><br/>CONTACT_FORCE<br/><b>Min bound</b>: 0<br/><b>Max bound</b>: 0<br/><b>contact_force_idx</b>: [0, 1]<br/><b>Index in list</b>: 0<br/><b>Shooting nodes index</b>: all<br/><br/>SUPERIMPOSE_MARKERS<br/><b>Min bound</b>: 0<br/><b>Max bound</b>: 0<br/><b>first_marker</b>: md<br/><b>second_marker</b>: mg1<br/><b>Index in list</b>: 1<br/><b>Shooting nodes index</b>: 0<br/><br/>SUPERIMPOSE_MARKERS<br/><b>Min bound</b>: 0<br/><b>Max bound</b>: 0<br/><b>first_marker</b>: md<br/><b>second_marker</b>: mg2<br/><b>Index in list</b>: 2<br/><b>Shooting nodes index</b>: 100<br/><br/>>]
+		constraints_node_0 [label=<<u><b>Constraints</b></u><br/>SUPERIMPOSE_MARKERS<br/><b>Min bound</b>: 0<br/><b>Max bound</b>: 0<br/><b>first_marker</b>: m0<br/><b>second_marker</b>: mg3<br/><b>Index in list</b>: 0<br/><b>Shooting nodes index</b>: 0<br/><br/>>]
 	}
 	OCP -> nlp_node_0
 	nlp_node_0 -> param_00 [color=lightgrey]

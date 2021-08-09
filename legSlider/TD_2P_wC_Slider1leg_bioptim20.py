@@ -52,12 +52,12 @@ def prepare_ocp(
     The OptimalControlProgram ready to be solved
     """
 
-    biorbd_model = biorbd.Model(biorbd_model_path), biorbd.Model(biorbd_model_path)
+    biorbd_model = biorbd.Model(biorbd_model_path) , biorbd.Model(biorbd_model_path)
 
-    n_shooting = 12, 12
-    final_time = 0.1, 0.35
+    n_shooting = 25, 25
+    final_time = 0.2, 0.4
 
-    tau_min, tau_max, tau_init = -1000, 1000, 0
+    tau_min, tau_max, tau_init = -500, 500, 0
 
     dynamics = DynamicsList()
     dynamics.add(DynamicsFcn.TORQUE_DRIVEN, with_contact=True)
@@ -66,12 +66,12 @@ def prepare_ocp(
     objective_functions = ObjectiveList()
     objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=0)
     objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=1)
-    # objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_TIME, weight=1, phase=0)
-    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_TIME, weight=1, phase=1)
-    # objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=0, derivative=True)
-    # objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=1, derivative=True)
-    # objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_COM_POSITION, weight=-1, axes=2, phase=1)
-    # objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_COM_VELOCITY, weight=-1, axes=2, phase=0)
+    objective_functions.add(ObjectiveFcn.Mayer.MINIMIZE_TIME, weight=0.01, phase=0, min_bound=0.1, max_bound=0.2)
+    objective_functions.add(ObjectiveFcn.Mayer.MINIMIZE_TIME, weight=0.01, phase=1, min_bound=0.3, max_bound=0.5)
+    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=0, derivative=True)
+    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=0.1, phase=1, derivative=True)
+    objective_functions.add(ObjectiveFcn.Mayer.MINIMIZE_COM_VELOCITY, weight=-1, axes=2, phase=0, quadratic=True)
+    objective_functions.add(ObjectiveFcn.Mayer.MINIMIZE_COM_POSITION, weight=-1, axes=2, phase=1, quadratic=True)
 
     x_bounds = BoundsList()
     x_bounds.add(bounds=QAndQDotBounds(biorbd_model[0]))
@@ -79,10 +79,11 @@ def prepare_ocp(
 
     x_bounds[0][:3, 0] = [0, 3*np.pi / 8, -3*np.pi / 4]
     x_bounds[0][3:, 0] = 0
-    x_bounds[0].min[0, -1] = 0
-    x_bounds[0].max[0, -1] = 0.24  # from -0.15 to 0.25 (0.2469) otherwise it won't converge
 
-    x_bounds[1][0, -1] = 0.4
+    x_bounds[0].min[0, -1] = 0
+    x_bounds[0].max[0, -1] = 0.24  # from -0.15 to 0.25 (0.2469) otherwise it won't converge (singularity)
+
+    x_bounds[1][0, -1] = 1
     x_bounds[1][3, -1] = 0
 
     u_bounds = BoundsList()
@@ -106,17 +107,12 @@ def prepare_ocp(
     constraints = ConstraintList()
     constraints.add(
         ConstraintFcn.TRACK_CONTACT_FORCES,
+        phase=0,
         min_bound=0,
         max_bound=np.inf,
-        node=Node.ALL,
+        node=Node.ALL_SHOOTING,
         contact_index=0,  # z axis
     )
-
-    constraints.add(ConstraintFcn.TRACK_MARKERS_VELOCITY, node=Node.ALL, phase=0,
-                    index=0)
-
-    # phase_transitions = PhaseTransitionList()
-    # phase_transitions.add(PhaseTransitionFcn.IMPACT, phase_pre_idx=0)
 
     return OptimalControlProgram(
         biorbd_model,
@@ -131,7 +127,6 @@ def prepare_ocp(
         constraints=constraints,
         ode_solver=ode_solver,
         n_threads=8,
-
     )
 
 
@@ -142,12 +137,15 @@ if __name__ == "__main__":
     ocp = prepare_ocp()
 
     # --- Solve the program --- #
-    sol = ocp.solve(show_online_optim=True)
+    sol = ocp.solve(show_online_optim=False)
 
     # --- Show results --- #
-    # sol.animate()
+    sol.print()
+    sol.animate()
     # sol.graphs()
+
     import matplotlib.pyplot as plt
+    plt.figure()
     for ii in range(0, 2):
         tau = sol.controls[ii]['tau']
         t0 = sol.phase_time[ii]
@@ -155,7 +153,9 @@ if __name__ == "__main__":
         ns = sol.ns[ii]
         plt.plot(np.linspace(t0, t0+t1, ns + 1), tau.T, ".-")
 
-    plt.legend()
+    # plt.legend()
     plt.grid()
     plt.title("Tau")
     plt.show()
+
+    ocp.save(sol, "Study_MS_vs_DC/JumperMS.bo")

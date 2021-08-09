@@ -93,7 +93,7 @@ def last_contact_frame_null(pn: PenaltyNode, idx_forces: np.ndarray) -> MX:
 
 
 def prepare_ocp(
-        biorbd_model_path: str = "Slider1Leg.bioMod",
+        biorbd_model_path: str = "SliderXY_1Leg.bioMod",
         ode_solver: OdeSolver = OdeSolver.RK4()
 ) -> OptimalControlProgram:
     """

@@ -29,7 +29,7 @@ from bioptim import (
 
 
 def prepare_ocp(
-    biorbd_model_path: str = "Slider1Leg.bioMod", ode_solver: OdeSolver = OdeSolver.RK4()
+    biorbd_model_path: str = "SliderXY_1Leg.bioMod", ode_solver: OdeSolver = OdeSolver.RK4()
 ) -> OptimalControlProgram:
     """
     Prepare the ocp

@@ -57,7 +57,7 @@ def set_CoM(biorbd_model: biorbd.Model, value: MX, extra_value: Any):
 
 
 def prepare_ocp(
-        biorbd_model_path: str = "Slider1Leg.bioMod",
+        biorbd_model_path: str = "SliderXY_1Leg.bioMod",
         ode_solver: OdeSolver = OdeSolver.RK4(),
         optim_CoM=True,
         max_CoM=None,
