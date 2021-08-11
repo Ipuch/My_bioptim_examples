@@ -42,7 +42,7 @@ def set_q0(biorbd_model: biorbd.Model, value: MX):
     pass
 
 
-def passive_moment(q: MX,  q_to_plot: list, stiffness: float = None,
+def passive_moment(q: MX,  q_to_plot: list, k: float = None,
                    q0: float = None) -> MX:
     """
     Create a used defined plot function with extra_parameters
@@ -53,7 +53,7 @@ def passive_moment(q: MX,  q_to_plot: list, stiffness: float = None,
         The current states of the optimization
     q_to_plot: list
         The slice indices to plot
-    stiffness
+    k
         float
     q0
         float
@@ -318,7 +318,7 @@ if __name__ == "__main__":
     ub = [50, np.pi]
     ocp = prepare_ocp("SliderXY_1Leg.bioMod", OdeSolver.RK4(), p, lb, ub)
 
-    ocp.add_plot("My New Extra Plot", lambda x, u, p: passive_moment(x, 4, k, q0), plot_type=PlotType.PLOT)
+    ocp.add_plot("My New Extra Plot", lambda t, x, u, p: passive_moment(x, 4, k, q0), plot_type=PlotType.PLOT)
 
     ocp.print(to_console=True, to_graph=False)
 

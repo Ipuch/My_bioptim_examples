@@ -2,7 +2,8 @@
 import bioviz
 import numpy as np
 
-model_name = "KINOVA_arm.bioMod"
+# model_name = "KINOVA_arm_deprecated.bioMod"
+model_name = "/home/puchaud/Projets_Python/My_bioptim_examples/Kinova_arm/KINOVA_arm_reverse.bioMod"
 # Load the model - for bioviz
 biorbd_viz = bioviz.Viz(model_name)
 #while biorbd_viz.vtk_window.is_active:
