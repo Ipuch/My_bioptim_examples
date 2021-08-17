@@ -12,7 +12,7 @@ segment part7
     ranges 	-3 3
             -3 3
             -3 3
-            -pi pi
+            -pi 2*pi
             -pi pi
             -pi pi
     mass 0.35022
@@ -29,7 +29,7 @@ segment part6
 	rtinmatrix 0
     rt 0     0     0 xyz 0 0 0 // we'll see later
     rotations z
-    ranges 	-2*pi 2*pi
+    ranges 	-pi/4 pi/4
     mass 0.08658
     inertia
         0.00001992 0.00000048 -0.00001098
@@ -44,7 +44,7 @@ segment part5
 	rtinmatrix 0
     rt 0    2*pi/3     0 xyz -0.07097 0 0.07968
     rotations z
-    ranges 	-2*pi 2*pi
+    ranges 	pi/12 3*pi/4
     mass 0.51119
     inertia
         0.00012720  0.00003720 -0.00002641
@@ -72,7 +72,7 @@ endsegment
 segment part3
     parent    part4
 	rtinmatrix 0
-    rt pi/2   0     0 xyz -0.01354 -0.14202 0
+    rt -pi/2   0     0 xyz -0.01354 -0.14202 0
     rotations z
     ranges 	-pi pi
     mass 0.172
@@ -89,7 +89,7 @@ segment part2
     rtinmatrix 0
     rt 0   0   0  xyz -0.120 0 0
     rotations z
-    ranges 	-pi pi
+    ranges 	0 2*pi/3
     mass 0.164
     inertia
         0.00003221 0 0
@@ -104,7 +104,7 @@ segment part1
     rtinmatrix 0
     rt 0   0   0 xyz -0.09154 0 0
     rotations z
-    ranges 	-pi pi
+    ranges 	0 2*pi/3
     mass 0.172
     inertia
         0.00001545 0 0
@@ -115,14 +115,47 @@ segment part1
 endsegment
 
 // Contact
-    contact    Contact_pt
+    contact    Contact_pt1
         parent    part1
         position  -0.120 0 0
         axis    xyz
     endcontact
+    // Contact
+    contact    Contact_pt2
+        parent    part1
+        position  -0.120 0 0.1
+        axis    xy
+    endcontact
 
 // Marker
-    marker    Contact_mk
+    marker    Contact_mk1
         parent    part1
         position  -0.120 0 0
-    endcontact
+    endmarker
+        marker    Contact_mk2
+        parent    part1
+        position  -0.120 0 0.1
+    endmarker
+    marker     grd_contact1
+        parent ground
+        position 0  0 0
+    endmarker
+    marker     grd_contact2
+        parent ground
+        position 0  0   0.1
+    endmarker
+
+    marker      mg1
+        parent ground
+        position -0.027  0.48 -0.10
+    endmarker
+
+    marker      mg2
+        parent ground
+        position -0.030 0.48 0 // position -0.035 0.35 0
+    endmarker
+
+    marker      md0
+        parent part7
+        position 0.01 0.01 0.01
+    endmarker

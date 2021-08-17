@@ -327,9 +327,9 @@ if __name__ == "__main__":
 
     # --- Show results --- #
     sol.print()
-    print(sol.parameters)
-    sol.animate()
-    sol.graphs()
+    # print(sol.parameters)
+    # sol.animate()
+    # sol.graphs()
 
     # --- results --- #
     tau = sol.controls['tau']

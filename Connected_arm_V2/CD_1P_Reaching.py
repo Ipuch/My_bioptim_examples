@@ -279,8 +279,9 @@ if __name__ == "__main__":
     sol = ocp.solve(show_online_optim=True)
 
     # --- Show results --- #
-    sol.animate()
+    # sol.animate()
     # sol.graphs()
+    sol.print()
 
     # --- results --- #
     tau = sol.controls['tau']
