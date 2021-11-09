@@ -1,0 +1,56 @@
+version 4
+
+// DEFINITION DU SEGMENTS
+
+segment ground
+endsegment
+
+segment point
+     translations z
+     rotations x
+    rangesQ  -10 10
+      -3.14 3.14
+    mass 1
+    inertia
+        1 0 0
+        0 1 0
+        0 0 1
+    com 0 0.25 0
+    mesh 0 0 0
+    mesh 0 0.5 0
+    endsegment
+
+
+
+// Soft contacts
+
+  softcontact Contact1
+        parent point
+        type sphere
+        position 0 0 0
+        radius 0.49
+        stiffness 1e1
+        damping 1
+    endsoftcontact
+
+
+softcontact Contact2
+        parent point
+        type sphere
+        position 0 0.5 0
+        radius 0.01
+        stiffness 1e5
+        damping 1
+    endsoftcontact
+
+// Markers
+
+marker marker_point
+	    parent point
+	    position 0 0 -0.1
+	endmarker
+
+marker mk2
+	    parent ground
+	    position 0 0 0
+	endmarker

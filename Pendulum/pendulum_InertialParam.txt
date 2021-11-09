@@ -1,0 +1,32 @@
+Propriétés de masse de pendulum
+     Configuration: Défaut
+     Système de coordonnées: -- par défaut --
+
+Masse (remplacée par l'utilisateur) = 1.0000 kilogrammes
+
+Volume = 9721903.5308 millimètres cubes
+
+Superficie = 0.3928 mètres carrés
+
+Centre de masse (remplacé par l'utilisateur): ( mètres )
+	X = -0.0005
+	Y = 0.0688
+	Z = -0.9542
+
+Axes d'inertie et moments d'inertie principaux (remplacés par l'utilisateur): ( kilogrammes * mètres carrés )
+Pris au centre de gravité.
+	 Ix = ( 0.0007, -0.1256,  0.9921)   	Px = 0.0086
+	 Iy = (-0.0008, -0.9921, -0.1256)   	Py = 0.0339
+	 Iz = ( 1.0000, -0.0007, -0.0008)   	Pz = 0.0391
+
+Moments d'inertie: ( kilogrammes * mètres carrés )
+Pris au centre de gravité et aligné avec le système de coordonnées de sortie.
+	Lxx = 0.0391	Lxy = 0.0000	Lxz = 0.0000
+	Lyx = 0.0000	Lyy = 0.0335	Lyz = -0.0032
+	Lzx = 0.0000	Lzy = -0.0032	Lzz = 0.0090
+
+Moments d'inertie: ( kilogrammes * mètres carrés )
+Pris au système de coordonnées de sortie.
+	Ixx = 0.9544	Ixy = 0.0000	Ixz = 0.0005
+	Iyx = 0.0000	Iyy = 0.9440	Iyz = -0.0688
+	Izx = 0.0005	Izy = -0.0688	Izz = 0.0137

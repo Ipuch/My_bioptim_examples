@@ -172,7 +172,8 @@ def dynamic_config(ocp: OptimalControlProgram, nlp: NonLinearProgram, with_conta
                                                  stiffness=stiffness, q0=q0)
 
     if with_contact:
-        ConfigureProblem.configure_contact_function(ocp, nlp, custom_contact)
+        ConfigureProblem.configure_contact_function(ocp, nlp, custom_contact, with_contact=with_contact,
+                                                 stiffness=stiffness, q0=q0)
 
 
 def prepare_ocp(
@@ -271,7 +272,7 @@ if __name__ == "__main__":
     q0 = np.pi/2+0.01
     ocp = prepare_ocp("SliderXY_1Leg.bioMod", OdeSolver.RK4(), k, q0)
 
-    ocp.add_plot("My New Extra Plot", lambda x, u, p: passive_moment(x, 4, k, q0), plot_type=PlotType.PLOT)
+    ocp.add_plot("My New Extra Plot", lambda t, x, u, p: passive_moment(x, 4, k, q0), plot_type=PlotType.PLOT)
 
     ocp.print(to_console=True, to_graph=False)
 
@@ -279,7 +280,7 @@ if __name__ == "__main__":
     sol = ocp.solve(show_online_optim=True)
 
     # --- Show results --- #
-    # sol.animate()
+    sol.animate()
     # sol.graphs()
     sol.print()
 

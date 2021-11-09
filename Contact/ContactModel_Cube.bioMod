@@ -1,0 +1,137 @@
+version 4
+
+// DEFINITION DU SEGMENTS
+
+segment ground
+endsegment
+
+segment point
+     translations xyz
+    rotations xyz
+    rangesQ
+        -10 10
+     -10 10
+    -10 10
+    -10 10
+     -10 10
+    -10 10
+
+    mass 1
+    inertia
+        1 0 0
+        0 1 0
+        0 0 1
+    com 0.05 -0.05 -0.05
+        mesh 0 -0.1 -0.1
+        mesh 0 0 -0.1
+        mesh 0 0 0
+        mesh 0 -0.1 0
+        mesh 0 -0.1 -0.1
+        mesh 0.1 -0.1 -0.1
+        mesh 0.1 0 -0.1
+        mesh 0 0 -0.1
+        mesh 0.1 0 -0.1
+        mesh 0.1 0 0
+        mesh 0 0 0
+        mesh 0.1 0 0
+        mesh 0.1 -0.1 0
+        mesh 0 -0.1 0
+        mesh 0.1 -0.1 0
+        mesh 0.1 -0.1 -0.1
+
+    endsegment
+
+
+
+// Soft contacts
+
+  softcontact Contact1
+        parent point
+        type sphere
+        position 0 0 0
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+
+softcontact Contact2
+        parent point
+        type sphere
+        position 0 0 -0.1
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+softcontact Contact3
+        parent point
+        type sphere
+        position 0.1 0 -0.1
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+softcontact Contact4
+        parent point
+        type sphere
+        position 0.1 -0.1 -0.1
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+    softcontact Contact5
+        parent point
+        type sphere
+        position 0 -0.1 -0.1
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+    softcontact Contact6
+        parent point
+        type sphere
+        position 0.1 -0.1 0
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+    softcontact Contact7
+        parent point
+        type sphere
+        position 0 -0.1 0
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+    softcontact Contact8
+        parent point
+        type sphere
+        position 0.1 0 0
+        radius 0.015
+        stiffness 100000
+        damping 5
+    endsoftcontact
+
+// Markers
+/*
+marker marker_point
+	    parent point
+	    position 0 0 0
+	endmarker
+
+marker start
+	    parent ground
+	    position 0 0 0.3
+	endmarker
+
+marker end
+	    parent ground
+	    position 0 0 0
+	endmarker
+*/

@@ -1,0 +1,27 @@
+version 4
+
+// DEFINITION DU SEGMENTS
+gravity 0 0 -9.81
+
+segment point
+    translations z
+    ranges
+        -20 20
+    mass 1
+    inertia
+        1 0 0
+        0 1 0
+        0 0 1
+    com 0 0 0
+endsegment
+
+// Soft contacts
+
+softcontact Contact1
+    parent point
+    type sphere
+    position 0 0 0
+    radius 0.5
+    stiffness 1e9
+    damping 7
+endsoftcontact

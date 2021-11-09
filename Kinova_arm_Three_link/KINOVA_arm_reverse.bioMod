@@ -1,0 +1,88 @@
+version 4
+
+gravity 0 0 -9.81
+
+segment ground
+endsegment
+
+segment part3
+    parent    ground
+    rtinmatrix 0
+    rt 0   0     0 xyz 0 0 0
+    translations xy
+    rotations z
+    ranges 	-1 1
+            -1 1
+            -pi pi
+    mass 0.172
+    inertia
+        0.00001545 0 0
+        0 0.00032826 0
+        0 0 0.00032966
+    com -0.06110784 0 0
+    meshfile geom\Reverse_Piece3_m.vtp
+endsegment
+
+segment part2
+    parent    part3
+    rtinmatrix 0
+    rt 0   0   0  xyz -0.120 0 0
+    rotations z
+    ranges 	-pi/6 2*pi/3 // 0 2*pi/3
+    mass 0.164
+    inertia
+        0.00003221 0 0
+        0 0.00021332 0
+        0 0 0.00020547
+    com -0.04577052 0.01345177 0
+    meshfile geom\Reverse_Piece2_m.vtp
+endsegment
+
+segment part1
+    parent    part2
+    rtinmatrix 0
+    rt 0   0   0 xyz -0.09154 0 0
+    rotations z
+    ranges 	-pi/6 2*pi/3 // 0 2*pi/3
+    mass 0.172
+    inertia
+        0.00001545 0 0
+        0 0.00032826 0
+        0 0 0.00032966
+    com -0.04577052 0.01345177 0
+    meshfile geom\Reverse_Piece1_m.vtp
+endsegment
+
+// Contact
+    contact    Contact_pt1
+        parent    part1
+        position  -0.120 0 0
+        axis    xy
+    endcontact
+    // Contact
+
+// Marker
+    marker    Contact_mk1
+        parent    part1
+        position  -0.120 0 0
+    endmarker
+
+    marker     grd_contact1
+        parent ground
+        position 0  0 0
+    endmarker
+
+    marker      mg1
+        parent ground
+        position 0.240  0.001 0
+    endmarker
+
+    marker      mg2
+        parent ground
+        position 0.15  0.29 0
+    endmarker
+
+    marker      md0
+        parent part3
+        position 0.00 0.00 0.00
+    endmarker

@@ -1,5 +1,5 @@
 """
-Converge
+converged, like this!
 """
 
 import biorbd_casadi as biorbd
@@ -57,28 +57,21 @@ def prepare_ocp(
     n_shooting = 30,
     final_time = 0.5,
 
-    tau_min, tau_max, tau_init = -200, 200, 0
+    tau_min, tau_max, tau_init = -40, 40, 0
 
     # dynamics = Dynamics(DynamicsFcn.TORQUE_DRIVEN, with_contact=False)
     dynamics = Dynamics(DynamicsFcn.TORQUE_DRIVEN, with_contact=True)
 
     objective_functions = ObjectiveList()
-    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=1, phase=0)
-    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_STATE, key="q", weight=1, phase=0)
-    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_STATE, key="qdot", weight=1, phase=0)
-    objective_functions.add(ObjectiveFcn.Mayer.SUPERIMPOSE_MARKERS, weight=10000, first_marker="md0",
-                            second_marker="mg2", node=Node.END)
-    objective_functions.add(ObjectiveFcn.Mayer.TRACK_STATE, key="q", weight=10, target=qfin, node=Node.END)
-    objective_functions.add(ObjectiveFcn.Lagrange.PROPORTIONAL_STATE, key="q", weight=0.1,
-                            first_dof=10, second_dof=11, coef=1)
-    objective_functions.add(ObjectiveFcn.Lagrange.PROPORTIONAL_STATE, key="qdot", weight=0.1,
-                            first_dof=10, second_dof=11, coef=1)
+    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_CONTROL, key="tau", weight=20, phase=0)
+    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_STATE, key="qdot", weight=5, phase=0)
+    objective_functions.add(ObjectiveFcn.Lagrange.MINIMIZE_STATE, key="q", index=[6, 9, 10, 11], weight=1, phase=0)
 
     x_bounds = BoundsList()
     x_bounds.add(bounds=QAndQDotBounds(biorbd_model[0]))
 
     x_bounds[0][nbQ:, 0] = 0  # 0 velocity at the beginning and the end to the phase
-    x_bounds[0][nbQ:-2, -1] = 0
+    x_bounds[0][nbQ:-3, -1] = 0
 
     u_bounds = BoundsList()
     u_bounds.add([tau_min] * biorbd_model[0].nbGeneralizedTorque(),
@@ -87,27 +80,21 @@ def prepare_ocp(
     u_bounds[0][6:, :] = 0
 
     x_init = InitialGuessList()
-    x_init.add(q0.tolist() + [0] * biorbd_model[0].nbQdot())  # [0] * (nbQ+ nbQdot)
+    x_init.add(q0.tolist() + [0] * nbQ)  # [0] * (nbQ+ nbQdot)
 
     u_init = InitialGuessList()
-    u_init.add([tau_init] * biorbd_model[0].nbGeneralizedTorque())
+    u_init.add([tau_init] * nbQ)
 
     # Constraints
     constraints = ConstraintList()
-    # constraints.add(
-    #     ConstraintFcn.TRACK_CONTACT_FORCES,
-    #     min_bound=-np.inf,
-    #     max_bound=np.inf,
-    #     node=Node.ALL,
-    # )
 
     constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.START, first_marker="mg1", second_marker="md0")
+    constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.END, first_marker="mg2", second_marker="md0")
+
     constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.START, first_marker="grd_contact1",
                     second_marker="Contact_mk1")
     constraints.add(ConstraintFcn.SUPERIMPOSE_MARKERS, node=Node.ALL, first_marker="grd_contact2",
                     second_marker="Contact_mk2")
-    # constraints.add(ConstraintFcn.PROPORTIONAL_STATE, first_dof=10, second_dof=11,
-    #                 coef=1, node=Node.ALL, key="q")
 
     return OptimalControlProgram(
         biorbd_model,
@@ -142,13 +129,22 @@ if __name__ == "__main__":
     ocp = prepare_ocp(model, pos_init, pos_fin)
     ocp.print(to_console=False, to_graph=True)
     # Custom plots
-    # ocp.add_plot_penalty(CostType.CONSTRAINTS)
+    ocp.add_plot_penalty(CostType.ALL)
 
     # --- Solve the program --- #
-    sol = ocp.solve(show_online_optim=False)
+    show_options = dict(show_bounds=True)
+    solver_options = {
+        "ipopt.tol": 1e-6,
+        "ipopt.max_iter": 2000,
+        "ipopt.hessian_approximation": "exact",  # "exact", "limited-memory"
+        "ipopt.limited_memory_max_history": 50,
+        "ipopt.linear_solver": "mumps",  # "ma57", "ma86", "mumps"
+    }
+
+    sol = ocp.solve(show_online_optim=True, show_options=show_options, solver_options=solver_options)
 
     # --- Show results --- #
     sol.print()
     ocp.save(sol, "Kinova.bo")
     sol.animate()
-    sol.graphs()
+    # sol.graphs()

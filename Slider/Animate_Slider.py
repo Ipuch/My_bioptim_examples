@@ -6,7 +6,7 @@ import numpy as np
 # biorbd_model = biorbd.Model("Slider.bioMod")
 # biorbd_model = biorbd.Model("pendulum.bioMod")
 # Load the model - for bioviz
-biorbd_viz = bioviz.Viz("Slider.bioMod")
+biorbd_viz = bioviz.Viz("pendulum.bioMod")
 #while biorbd_viz.vtk_window.is_active:
 #    # Do some stuff...
 #    biorbd_viz.refresh_window()
